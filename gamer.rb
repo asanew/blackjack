@@ -2,21 +2,29 @@ require_relative 'deck'
 require_relative 'card'
 
 class Gamer
-  attr_reader :bank, :cards
+  attr_reader :wallet, :cards
 
   def initialize
-    @bank = 100
+    @wallet = 100
     @cards = []
   end
   
   def bet(ammount = 10)
-    @bank -= ammount
-    raise "Not enough money" if @bank < 0
+    @wallet -= ammount
+    raise "Not enough money" if @wallet < 0
     return ammount
+  end
+
+  def gain(ammount)
+    @wallet += ammount
   end
 
   def get_card(deck)
     @cards << deck.take_card
+  end
+
+  def drop_cards
+    @cards = []
   end
 
   def calc_points
@@ -24,13 +32,13 @@ class Gamer
     has_aces = false
     cards.each do |card|
       points += card.value
-      has_aces = true if card.value == 1
+      has_aces = true if card.is_ace?
     end
     points += 10 if has_aces && points + 10 <= 21
     return points
   end
 
   def to_s
-    "Gamer has cards: #{@cards*" "} and $#{@bank} in bank"
+    "Gamer has cards: #{@cards*" "} and $#{@wallet} in wallet"
   end
 end

@@ -16,6 +16,9 @@ class Card
   def to_s
     "#{@name}#{@suit}"
   end
-
+  
+  def is_ace?
+    @name == 'A'
+  end
 end
 
