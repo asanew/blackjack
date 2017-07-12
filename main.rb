@@ -30,7 +30,7 @@ class Program
     if gamer_points <=21
       if gamer_points > dealer_points
         gamer_gain = @bank
-        puts 'Congratulations! You are won!'
+        puts 'Congratulations! You win!'
       elsif gamer_points == dealer_points
         gamer_gain = @bank / 2
         puts "It's a draw"
@@ -69,15 +69,19 @@ class Program
     puts "$#{@bank} in bank"
   end
 
+  def dealer_think
+    @gamers[1].think(@deck)
+  end
+  
   def choice_pass
     @turn += 1
-    @gamers[1].think(@deck)
+    dealer_think
   end
 
   def choice_card
     @gamers[0].get_card(@deck)
     @turn += 1
-    @gamers[1].think(@deck)
+    dealer_think
   end
 
   def user_play
@@ -104,6 +108,16 @@ class Program
       end
     end
   end
+
+  def validate!
+    if @deck.cards.length < 6
+      raise 'Not enough cards in a deck'
+    elsif @gamers[0].wallet == 0
+      raise 'Sorry, you a lost all your money'
+    elsif @gamers[1].wallet == 0
+      raise 'Congratulations, you are winner!'
+    end
+  end
   
   def menu
     hello
@@ -113,8 +127,9 @@ class Program
       case user_input
       when 'start'
         user_play
+        validate!
       when 'exit'
-        break
+        raise 'User exit'
       else
         error_message
       end
@@ -123,4 +138,20 @@ class Program
 end
 
 prog = Program.new
-prog.menu
+loop do
+  begin
+    begin
+      prog.menu
+    rescue => e
+      puts e.message
+      prog = Program.new
+      puts 'Game is over, begin new game? (y/n)'
+      user_input = gets.chomp.downcase
+      if user_input == 'n'
+        raise 'User end game'
+      end
+    end
+  rescue
+    break
+  end
+end
